@@ -20,6 +20,22 @@ namespace StockLib
                 keys.Add(query.Type.ToKey(query.StockNo));
             }
             var stockList = string.Join("%7c", keys);
+            return await GetStockInfo(stockList);
+        }
+        public async Task<List<StockInfo>> GetStocksInfo(Dictionary<string, StockType> queries)
+        {
+            var keys = new List<string>();
+            foreach (var query in queries)
+            {
+                if (string.IsNullOrEmpty(query.Key))
+                    continue;
+                keys.Add(query.Value.ToKey(query.Key));
+            }
+            var stockList = string.Join("%7c", keys);
+            return await GetStockInfo(stockList);
+        }
+        private async Task<List<StockInfo>> GetStockInfo(string stockList)
+        {
             using (var httpClient = new System.Net.Http.HttpClient())
             {
                 var json = await httpClient.GetStringAsync($"http://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch={stockList}&json=1&delay=0&_={DateTime.UtcNow.ToJavascriptGetTime()}");
