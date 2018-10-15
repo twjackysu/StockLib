@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace StockLib
 {
-    public class StockInfoBuilder
+    public class StockInfoBuilder: IStockInfoBuilder
     {
-        public async Task<List<StockInfo>> GetStocksInfo(params StockQuery[] queries)
+        public async Task<List<StockInfo>> GetStocksInfo(bool needHistory, params StockQuery[] queries)
         {
             var keys = new List<string>();
             foreach (var query in queries)
@@ -20,9 +20,9 @@ namespace StockLib
                 keys.Add(query.Type.ToKey(query.StockNo));
             }
             var stockList = string.Join("%7c", keys);
-            return await GetStockInfo(stockList);
+            return await GetStockInfo(stockList, needHistory);
         }
-        public async Task<List<StockInfo>> GetStocksInfo(Dictionary<string, StockType> queries)
+        public async Task<List<StockInfo>> GetStocksInfo(bool needHistory, Dictionary<string, StockType> queries)
         {
             var keys = new List<string>();
             foreach (var query in queries)
@@ -32,9 +32,9 @@ namespace StockLib
                 keys.Add(query.Value.ToKey(query.Key));
             }
             var stockList = string.Join("%7c", keys);
-            return await GetStockInfo(stockList);
+            return await GetStockInfo(stockList, needHistory);
         }
-        private async Task<List<StockInfo>> GetStockInfo(string stockList)
+        private async Task<List<StockInfo>> GetStockInfo(string stockList, bool needHistory)
         {
             using (var httpClient = new System.Net.Http.HttpClient())
             {
@@ -65,8 +65,11 @@ namespace StockLib
                         stockInfo.YesterdayClosingPrice = Convert.ToSingle(item["y"]);
                         stockInfo.LimitUp = Convert.ToSingle(item["u"]);
                         stockInfo.LimitDown = Convert.ToSingle(item["w"]);
-                        var historyBuilder = new HistoryBuilder();
-                        stockInfo.StockHistory = historyBuilder.GetStockHistories(stockInfo.No, DateTime.UtcNow, stockInfo.Type);
+                        if (needHistory)
+                        {
+                            var historyBuilder = new HistoryBuilder();
+                            stockInfo.StockHistory = historyBuilder.GetStockHistories(stockInfo.No, DateTime.UtcNow, stockInfo.Type);
+                        }
                         result.Add(stockInfo);
                     }
                     return result;
