@@ -24,6 +24,8 @@ namespace StockLib
         }
         public async Task<List<StockInfo>> GetStocksInfo(bool needHistory, Dictionary<string, StockType> queries)
         {
+            if (queries.Count < 1)
+                return new List<StockInfo>();
             var keys = new List<string>();
             foreach (var query in queries)
             {
