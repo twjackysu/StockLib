@@ -11,13 +11,13 @@ namespace TestExample
         {
             TSEOTCList test = new TSEOTCList();
             var OTCList = test.GetOTCList();
-            var searchStockList = new string[] { "2317", "2330", "3088" };
-            StockInfoBuilder stockInfoBuilder = new StockInfoBuilder();
-            var stockInfo = stockInfoBuilder.GetStocksInfo(
-                searchStockList.Select(
+            var searchStockList = new string[] { "2439", "2408", "3088" };
+            var queries = searchStockList.Select(
                         x => OTCList.Any(y => y == x) ? new StockQuery(StockType.OTC, x) : new StockQuery(StockType.TSE, x)
-                    ).ToArray()
-                );
+                    ).ToArray();
+            StockInfoBuilder stockInfoBuilder = new StockInfoBuilder();
+            var stockInfo = stockInfoBuilder.GetStocksInfo(false, queries);
+
             Task.WaitAll(stockInfo);
             var result = stockInfo.Result;
             Console.ReadKey();

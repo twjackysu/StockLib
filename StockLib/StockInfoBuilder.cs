@@ -12,6 +12,8 @@ namespace StockLib
     {
         public async Task<List<StockInfo>> GetStocksInfo(bool needHistory, params StockQuery[] queries)
         {
+            if (queries.Length < 1)
+                return new List<StockInfo>();
             var keys = new List<string>();
             foreach (var query in queries)
             {
@@ -19,7 +21,7 @@ namespace StockLib
                     continue;
                 keys.Add(query.Type.ToKey(query.StockNo));
             }
-            var stockList = string.Join("%7c", keys);
+            var stockList = string.Join("%257c", keys);
             return await GetStockInfo(stockList, needHistory);
         }
         public async Task<List<StockInfo>> GetStocksInfo(bool needHistory, Dictionary<string, StockType> queries)
@@ -33,7 +35,7 @@ namespace StockLib
                     continue;
                 keys.Add(query.Value.ToKey(query.Key));
             }
-            var stockList = string.Join("%7c", keys);
+            var stockList = string.Join("%257c", keys);
             return await GetStockInfo(stockList, needHistory);
         }
         private async Task<List<StockInfo>> GetStockInfo(string stockList, bool needHistory)
