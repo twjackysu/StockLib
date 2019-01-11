@@ -7,8 +7,10 @@ var temp = new TSEOTCList();
 var TSEList = temp.GetTSEList();//上市
 var OTCList = temp.GetOTCList();//上櫃
 ```
-使用new StockQuery(StockType, StockNo)來搜尋股票資訊，可以是多個
+
+目前查詢時間僅限 股票交易時間 9:00~13:30
+使用ValueTuple(StockType, StockNo)來搜尋股票資訊，可以是多個
 ```C#
 var stockInfoBuilder = new StockInfoBuilder();
-var stockInfo = await stockInfoBuilder.GetStocksInfo(new StockQuery(StockType.TSE, "2317"), new StockQuery(StockType.OTC, "5015"));
+var stockInfo = await stockInfoBuilder.GetStocksInfo((StockType.TSE, "2317"), (StockType.OTC, "5015"));
 ```
