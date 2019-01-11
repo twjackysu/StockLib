@@ -10,16 +10,16 @@ namespace StockLib
 {
     public class StockInfoBuilder: IStockInfoBuilder
     {
-        public async Task<List<StockInfo>> GetStocksInfo(bool needHistory, params StockQuery[] queries)
+        public async Task<List<StockInfo>> GetStocksInfo(bool needHistory, params (StockType type, string stockNo)[] queries)
         {
             if (queries.Length < 1)
                 return new List<StockInfo>();
             var keys = new List<string>();
             foreach (var query in queries)
             {
-                if (string.IsNullOrEmpty(query.StockNo))
+                if (string.IsNullOrEmpty(query.stockNo))
                     continue;
-                keys.Add(query.Type.ToKey(query.StockNo));
+                keys.Add(query.type.ToKey(query.stockNo));
             }
             var stockList = string.Join("%257c", keys);
             return await GetStockInfo(stockList, needHistory);

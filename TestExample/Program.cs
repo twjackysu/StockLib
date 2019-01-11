@@ -13,7 +13,7 @@ namespace TestExample
             var OTCList = test.GetOTCList();
             var searchStockList = new string[] { "2439", "2408", "3088" };
             var queries = searchStockList.Select(
-                        x => OTCList.Any(y => y == x) ? new StockQuery(StockType.OTC, x) : new StockQuery(StockType.TSE, x)
+                        x => OTCList.Any(y => y == x) ? (StockType.OTC, x) : (StockType.TSE, x)
                     ).ToArray();
             StockInfoBuilder stockInfoBuilder = new StockInfoBuilder();
             var stockInfo = stockInfoBuilder.GetStocksInfo(false, queries);
