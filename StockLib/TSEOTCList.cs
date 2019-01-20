@@ -1,6 +1,6 @@
 ﻿using AngleSharp.Dom;
-using AngleSharp.Dom.Html;
-using AngleSharp.Parser.Html;
+using AngleSharp.Html.Dom;
+using AngleSharp.Html.Parser;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -21,7 +21,7 @@ namespace StockLib
             var url = "http://isin.twse.com.tw/isin/C_public.jsp?strMode=4";
             var html = GetHtml(url);
             HtmlParser parser = new HtmlParser();
-            IHtmlDocument doc = parser.Parse(html);
+            IHtmlDocument doc = parser.ParseDocument(html);
             IEnumerable<IElement> element = doc.QuerySelectorAll("body > table.h4 > tbody > tr > td:nth-child(1)[bgcolor='#FAFAD2']:not([colspan='7'])");
 
             return element.Select(x => {
@@ -33,7 +33,7 @@ namespace StockLib
             var url = "http://isin.twse.com.tw/isin/C_public.jsp?strMode=2";
             var html = GetHtml(url);
             HtmlParser parser = new HtmlParser();
-            IHtmlDocument doc = parser.Parse(html);
+            IHtmlDocument doc = parser.ParseDocument(html);
             IEnumerable<IElement> element = doc.QuerySelectorAll("body > table.h4 > tbody > tr > td:nth-child(1)[bgcolor='#FAFAD2']:not([colspan='7'])");
             
             return element.Select(x => {
