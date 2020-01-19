@@ -24,7 +24,7 @@ namespace StockLib
             IHtmlDocument doc = parser.ParseDocument(html);
             IEnumerable<IElement> element = doc.QuerySelectorAll("body > table.h4 > tbody > tr > td:nth-child(1)[bgcolor='#FAFAD2']:not([colspan='7'])");
 
-            return element.Select(x => {
+            return element.Where(x => !(x.TextContent[x.TextContent.Length - 3] == '購' || x.TextContent[x.TextContent.Length - 3] == '售')).Select(x => {
                 var splitStr = x.TextContent.Split('　'); return splitStr[0];
             }).ToArray();
         }
@@ -36,7 +36,7 @@ namespace StockLib
             IHtmlDocument doc = parser.ParseDocument(html);
             IEnumerable<IElement> element = doc.QuerySelectorAll("body > table.h4 > tbody > tr > td:nth-child(1)[bgcolor='#FAFAD2']:not([colspan='7'])");
             
-            return element.Select(x => {
+            return element.Where(x => !(x.TextContent[x.TextContent.Length-3] == '購' || x.TextContent[x.TextContent.Length - 3] == '售')).Select(x => {
                 var splitStr = x.TextContent.Split('　'); return splitStr[0];
             }).ToArray();
         }
