@@ -56,12 +56,12 @@ namespace StockLib
                         stockInfo.Name = item["n"].ToString();
                         stockInfo.FullName = item["nf"].ToString();
                         stockInfo.LastTradedPrice = Convert.ToSingle(item["z"]);
-                        stockInfo.LastVolume = Convert.ToUInt32(item["tv"]);
+                        stockInfo.LastVolume = item["tv"].ToString() == "-"? 0 : Convert.ToUInt32(item["tv"]);
                         stockInfo.TotalVolume = Convert.ToUInt32(item["v"]);
-                        stockInfo.Top5SellPrice = item["a"].ToString().Split('_').Where(x => x.Length > 0).Select(x => Convert.ToSingle(x)).ToArray();
-                        stockInfo.Top5SellVolume = item["f"].ToString().Split('_').Where(x => x.Length > 0).Select(x => Convert.ToUInt32(x)).ToArray();
-                        stockInfo.Top5BuyPrice = item["b"].ToString().Split('_').Where(x => x.Length > 0).Select(x => Convert.ToSingle(x)).ToArray();
-                        stockInfo.Top5BuyVolume = item["g"].ToString().Split('_').Where(x => x.Length > 0).Select(x => Convert.ToUInt32(x)).ToArray();
+                        stockInfo.Top5SellPrice = item["a"].ToString() == "-" ? new float[]{ } : item["a"].ToString().Split('_').Where(x => x.Length > 0).Select(x => Convert.ToSingle(x)).ToArray();
+                        stockInfo.Top5SellVolume = item["f"].ToString() == "-" ? new uint[] { } : item["f"].ToString().Split('_').Where(x => x.Length > 0).Select(x => Convert.ToUInt32(x)).ToArray();
+                        stockInfo.Top5BuyPrice = item["b"].ToString() == "-"? new float[] { } : item["b"].ToString().Split('_').Where(x => x.Length > 0).Select(x => Convert.ToSingle(x)).ToArray();
+                        stockInfo.Top5BuyVolume = item["g"].ToString() == "-" ? new uint[] { } : item["g"].ToString().Split('_').Where(x => x.Length > 0).Select(x => Convert.ToUInt32(x)).ToArray();
                         stockInfo.SyncTime = new DateTime(1970, 1, 1).AddMilliseconds(Convert.ToUInt64(item["tlong"]));
                         stockInfo.HighestPrice = Convert.ToSingle(item["h"]);
                         stockInfo.LowestPrice = Convert.ToSingle(item["l"]);
