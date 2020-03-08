@@ -55,7 +55,7 @@ namespace StockLib
                         stockInfo.Type = item["ex"].ToString() == StockType.OTC.ToString().ToLower() ? StockType.OTC : StockType.TSE;
                         stockInfo.Name = item["n"].ToString();
                         stockInfo.FullName = item["nf"].ToString();
-                        stockInfo.LastTradedPrice = Convert.ToSingle(item["z"]);
+                        stockInfo.LastTradedPrice = item["z"].ToString() == "-" ? Convert.ToSingle(item["y"]) : Convert.ToSingle(item["z"]);
                         stockInfo.LastVolume = item["tv"].ToString() == "-"? 0 : Convert.ToUInt32(item["tv"]);
                         stockInfo.TotalVolume = Convert.ToUInt32(item["v"]);
                         stockInfo.Top5SellPrice = item["a"].ToString() == "-" ? new float[]{ } : item["a"].ToString().Split('_').Where(x => x.Length > 0).Select(x => Convert.ToSingle(x)).ToArray();
