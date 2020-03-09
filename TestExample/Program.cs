@@ -7,20 +7,16 @@ namespace TestExample
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             TSEOTCList test = new TSEOTCList();
             var OTCList = test.GetOTCList();
-            var searchStockList = new string[] { "2439", "2408", "3088" };
+            var searchStockList = new string[] { "2439", "2330", "2317" };
             var queries = searchStockList.Select(
-                        x => OTCList.Any(y => y == x) ? (StockType.OTC, x) : (StockType.TSE, x)
+                        x => OTCList.Contains(x) ? (StockType.OTC, x) : (StockType.TSE, x)
                     ).ToArray();
             StockInfoBuilder stockInfoBuilder = new StockInfoBuilder();
-            var stockInfo = stockInfoBuilder.GetStocksInfo(false, queries);
-
-            Task.WaitAll(stockInfo);
-            var result = stockInfo.Result;
-            Console.ReadKey();
+            var stockInfos = await stockInfoBuilder.GetStocksInfo(true, queries);
         }
     }
 }

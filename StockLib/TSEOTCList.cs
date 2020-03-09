@@ -16,7 +16,7 @@ namespace StockLib
             //.Net Core need Nuget: System.Text.Encoding.CodePages
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         }
-        public string[] GetOTCList()
+        public HashSet<string> GetOTCList()
         {
             var url = "http://isin.twse.com.tw/isin/C_public.jsp?strMode=4";
             var html = GetHtml(url);
@@ -26,9 +26,9 @@ namespace StockLib
 
             return element.Where(x => !(x.TextContent[x.TextContent.Length - 3] == '購' || x.TextContent[x.TextContent.Length - 3] == '售')).Select(x => {
                 var splitStr = x.TextContent.Split('　'); return splitStr[0];
-            }).ToArray();
+            }).ToHashSet();
         }
-        public string[] GetTSEList()
+        public HashSet<string> GetTSEList()
         {
             var url = "http://isin.twse.com.tw/isin/C_public.jsp?strMode=2";
             var html = GetHtml(url);
@@ -38,7 +38,7 @@ namespace StockLib
             
             return element.Where(x => !(x.TextContent[x.TextContent.Length-3] == '購' || x.TextContent[x.TextContent.Length - 3] == '售')).Select(x => {
                 var splitStr = x.TextContent.Split('　'); return splitStr[0];
-            }).ToArray();
+            }).ToHashSet();
         }
         private string GetHtml(string url)
         {
