@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace StockLib
 {
-    public class StockInfoBuilder: IStockInfoBuilder
+    public class StockInfoBuilder : IStockInfoBuilder
     {
         public async Task<List<StockInfo>> GetStocksInfo(bool needHistory, params (StockType type, string stockNo)[] queries)
         {
@@ -55,13 +55,13 @@ namespace StockLib
                         stockInfo.Type = item["ex"].ToString() == StockType.OTC.ToString().ToLower() ? StockType.OTC : StockType.TSE;
                         stockInfo.Name = item["n"].ToString();
                         stockInfo.FullName = item["nf"].ToString();
-                        stockInfo.LastTradedPrice = item["z"].ToString() == "-" ? Convert.ToSingle(item["y"]) : Convert.ToSingle(item["z"]);
-                        stockInfo.LastVolume = item["tv"].ToString() == "-"? 0 : Convert.ToUInt32(item["tv"]);
+                        stockInfo.LastTradedPrice = item["z"] == null || item["z"].ToString() == "-" ? Convert.ToSingle(item["y"]) : Convert.ToSingle(item["z"]);
+                        stockInfo.LastVolume = item["tv"].ToString() == "-" ? 0 : Convert.ToUInt32(item["tv"]);
                         stockInfo.TotalVolume = Convert.ToUInt32(item["v"]);
-                        stockInfo.Top5SellPrice = item["a"].ToString() == "-" ? new float[]{ } : item["a"].ToString().Split('_').Where(x => x.Length > 0).Select(x => Convert.ToSingle(x)).ToArray();
-                        stockInfo.Top5SellVolume = item["f"].ToString() == "-" ? new uint[] { } : item["f"].ToString().Split('_').Where(x => x.Length > 0).Select(x => Convert.ToUInt32(x)).ToArray();
-                        stockInfo.Top5BuyPrice = item["b"].ToString() == "-"? new float[] { } : item["b"].ToString().Split('_').Where(x => x.Length > 0).Select(x => Convert.ToSingle(x)).ToArray();
-                        stockInfo.Top5BuyVolume = item["g"].ToString() == "-" ? new uint[] { } : item["g"].ToString().Split('_').Where(x => x.Length > 0).Select(x => Convert.ToUInt32(x)).ToArray();
+                        stockInfo.Top5SellPrice = item["a"] == null || item["a"].ToString() == "-" ? new float[] { } : item["a"].ToString().Split('_').Where(x => x.Length > 0).Select(x => Convert.ToSingle(x)).ToArray();
+                        stockInfo.Top5SellVolume = item["f"] == null || item["f"].ToString() == "-" ? new uint[] { } : item["f"].ToString().Split('_').Where(x => x.Length > 0).Select(x => Convert.ToUInt32(x)).ToArray();
+                        stockInfo.Top5BuyPrice = item["b"] == null || item["b"].ToString() == "-" ? new float[] { } : item["b"].ToString().Split('_').Where(x => x.Length > 0).Select(x => Convert.ToSingle(x)).ToArray();
+                        stockInfo.Top5BuyVolume = item["g"] == null || item["g"].ToString() == "-" ? new uint[] { } : item["g"].ToString().Split('_').Where(x => x.Length > 0).Select(x => Convert.ToUInt32(x)).ToArray();
                         stockInfo.SyncTime = new DateTime(1970, 1, 1).AddMilliseconds(Convert.ToUInt64(item["tlong"]));
                         stockInfo.HighestPrice = Convert.ToSingle(item["h"]);
                         stockInfo.LowestPrice = Convert.ToSingle(item["l"]);
