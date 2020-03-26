@@ -10,7 +10,7 @@ namespace StockLib
         public string Name { get; set; }
         public string FullName { get; set; }
         /// <summary>最新成交價/summary>
-        public float LastTradedPrice { get; set; }
+        public float? LastTradedPrice { get; set; }
         /// <summary>最新一筆交易成交量/summary>
         public uint LastVolume { get; set; }
         /// <summary>今日累積成交量</summary>
@@ -26,11 +26,11 @@ namespace StockLib
         /// <summary>最後Sync時間</summary>
         public DateTime SyncTime { get; set; }
         /// <summary>最高價</summary>
-        public float HighestPrice { get; set; }
+        public float? HighestPrice { get; set; }
         /// <summary>最低價</summary>
-        public float LowestPrice { get; set; }
+        public float? LowestPrice { get; set; }
         /// <summary>開盤價</summary>
-        public float OpeningPrice { get; set; }
+        public float? OpeningPrice { get; set; }
         /// <summary>昨日收盤價</summary>
         public float YesterdayClosingPrice { get; set; }
         /// <summary>漲停點</summary>

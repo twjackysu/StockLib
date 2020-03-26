@@ -19,7 +19,7 @@ namespace StockLib
             {
                 if (string.IsNullOrEmpty(query.stockNo))
                     continue;
-                keys.Add(query.type.ToKey(query.stockNo));
+                keys.Add($"{query.type.ToKey(query.stockNo)}");
             }
             var stockList = string.Join("%257c", keys);
             return await GetStockInfo(stockList, needHistory);
@@ -33,7 +33,7 @@ namespace StockLib
             {
                 if (string.IsNullOrEmpty(query.Key))
                     continue;
-                keys.Add(query.Value.ToKey(query.Key));
+                keys.Add($"{query.Value.ToKey(query.Key)}");
             }
             var stockList = string.Join("%257c", keys);
             return await GetStockInfo(stockList, needHistory);
@@ -55,7 +55,7 @@ namespace StockLib
                         stockInfo.Type = item["ex"].ToString() == StockType.OTC.ToString().ToLower() ? StockType.OTC : StockType.TSE;
                         stockInfo.Name = item["n"].ToString();
                         stockInfo.FullName = item["nf"].ToString();
-                        stockInfo.LastTradedPrice = item["z"] == null || item["z"].ToString() == "-" ? Convert.ToSingle(item["y"]) : Convert.ToSingle(item["z"]);
+                        stockInfo.LastTradedPrice = item["z"] == null || item["z"].ToString() == "-" ? (float?)null : Convert.ToSingle(item["z"]);
                         stockInfo.LastVolume = item["tv"].ToString() == "-" ? 0 : Convert.ToUInt32(item["tv"]);
                         stockInfo.TotalVolume = Convert.ToUInt32(item["v"]);
                         stockInfo.Top5SellPrice = item["a"] == null || item["a"].ToString() == "-" ? new float[] { } : item["a"].ToString().Split('_').Where(x => x.Length > 0).Select(x => Convert.ToSingle(x)).ToArray();
@@ -63,9 +63,9 @@ namespace StockLib
                         stockInfo.Top5BuyPrice = item["b"] == null || item["b"].ToString() == "-" ? new float[] { } : item["b"].ToString().Split('_').Where(x => x.Length > 0).Select(x => Convert.ToSingle(x)).ToArray();
                         stockInfo.Top5BuyVolume = item["g"] == null || item["g"].ToString() == "-" ? new uint[] { } : item["g"].ToString().Split('_').Where(x => x.Length > 0).Select(x => Convert.ToUInt32(x)).ToArray();
                         stockInfo.SyncTime = new DateTime(1970, 1, 1).AddMilliseconds(Convert.ToUInt64(item["tlong"]));
-                        stockInfo.HighestPrice = Convert.ToSingle(item["h"]);
-                        stockInfo.LowestPrice = Convert.ToSingle(item["l"]);
-                        stockInfo.OpeningPrice = Convert.ToSingle(item["o"]);
+                        stockInfo.HighestPrice = item["h"] == null || item["h"].ToString() == "-" ? (float?)null : Convert.ToSingle(item["h"]);
+                        stockInfo.LowestPrice = item["l"] == null || item["l"].ToString() == "-" ? (float?)null : Convert.ToSingle(item["l"]);
+                        stockInfo.OpeningPrice = item["o"] == null || item["o"].ToString() == "-" ? (float?)null : Convert.ToSingle(item["o"]);
                         stockInfo.YesterdayClosingPrice = Convert.ToSingle(item["y"]);
                         stockInfo.LimitUp = Convert.ToSingle(item["u"]);
                         stockInfo.LimitDown = Convert.ToSingle(item["w"]);
