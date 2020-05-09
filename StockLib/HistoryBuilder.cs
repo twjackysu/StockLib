@@ -1,49 +1,38 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
-using System.Linq;
 
 namespace StockLib
 {
-    public class HistoryBuilder
+    public class HistoryBuilder : IHistoryBuilder
     {
-        public StockHistory[] GetStockHistories(string stockNo, DateTime dateTime, StockType type)
+        private readonly ILogger<HistoryBuilder> logger;
+        public HistoryBuilder(ILogger<HistoryBuilder> logger)
         {
-            List<StockHistory> result = new List<StockHistory>();
-            var AMonthAgo = dateTime.AddMonths(-1);
+            this.logger = logger;
+        }
+        public async Task<StockHistory[]> GetStockHistories(string stockNo, DateTime dateTime, StockType type)
+        {
+            var result = new List<StockHistory>();
             try
             {
                 switch (type)
                 {
                     case StockType.OTC:
-                        var tGetData = GetTPEXData(stockNo, dateTime);
-                        var tGetAMonthAgoData = GetTPEXData(stockNo, AMonthAgo);
-                        Task.WaitAll(tGetData, tGetAMonthAgoData);
-                        var tpex = JsonConvert.DeserializeObject<TPEXAPIModel>(tGetData.Result);
-                        var tpexAMonthAgo = JsonConvert.DeserializeObject<TPEXAPIModel>(tGetAMonthAgoData.Result);
+                        var tGetData = await GetTPEXData(stockNo, dateTime);
+                        var tpex = JsonConvert.DeserializeObject<TPEXAPIModel>(tGetData);
                         foreach (var data in tpex.aaData)
-                        {
-                            result.Add(new StockHistory(data));
-                        }
-                        foreach (var data in tpexAMonthAgo.aaData)
                         {
                             result.Add(new StockHistory(data));
                         }
                         break;
                     case StockType.TSE:
-                        tGetData = GetTWSEData(stockNo, dateTime);
-                        tGetAMonthAgoData = GetTWSEData(stockNo, AMonthAgo);
-                        Task.WaitAll(tGetData, tGetAMonthAgoData);
-                        var twse = JsonConvert.DeserializeObject<TWSEAPIModel>(tGetData.Result);
-                        var twseAMonthAgo = JsonConvert.DeserializeObject<TWSEAPIModel>(tGetAMonthAgoData.Result);
+                        tGetData = await GetTWSEData(stockNo, dateTime);
+                        var twse = JsonConvert.DeserializeObject<TWSEAPIModel>(tGetData);
                         foreach (var data in twse.data)
-                        {
-                            result.Add(new StockHistory(data));
-                        }
-                        foreach (var data in twseAMonthAgo.data)
                         {
                             result.Add(new StockHistory(data));
                         }
@@ -52,7 +41,7 @@ namespace StockLib
             }
             catch (AggregateException e)
             {
-                //throw e;
+                logger.LogError(e, $"Error when GetStockHistories({stockNo}, {dateTime:yyyy-MM}, {type})");
             }
             return result.ToArray();
         }
@@ -62,7 +51,7 @@ namespace StockLib
             using (var client = new HttpClient())
             {
 
-                var url = $"http://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date={dateTime.ToString("yyyyMM01")}&stockNo={stockNo}";
+                var url = $"https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date={dateTime:yyyyMM01}&stockNo={stockNo}";
                 return await client.GetStringAsync(url);
             }
         }
@@ -71,7 +60,7 @@ namespace StockLib
             using (var client = new HttpClient())
             {
                 var dateMonthStr = $"{dateTime.Year - 1911}/{dateTime.Month}";
-                var url = $"http://www.tpex.org.tw/web/stock/aftertrading/daily_trading_info/st43_result.php?d={dateMonthStr}&stkno={stockNo}";
+                var url = $"http://www.tpex.org.tw/web/stock/aftertrading/daily_trading_info/st43_result.php?l=zh-tw&d={dateMonthStr}&stkno={stockNo}";
                 return await client.GetStringAsync(url);
             }
         }

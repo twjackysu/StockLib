@@ -1,5 +1,10 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using NLog;
+using NLog.Extensions.Logging;
 using StockLib;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -9,14 +14,62 @@ namespace TestExample
     {
         static async Task Main(string[] args)
         {
-            TSEOTCList test = new TSEOTCList();
-            var OTCList = test.GetOTCList();
-            var searchStockList = new string[] { "2439", "2330", "2317" };
-            var queries = searchStockList.Select(
-                        x => OTCList.Contains(x) ? (StockType.OTC, x) : (StockType.TSE, x)
-                    ).ToArray();
-            StockInfoBuilder stockInfoBuilder = new StockInfoBuilder();
-            var stockInfos = await stockInfoBuilder.GetStocksInfo(true, queries);
+
+            var logger = LogManager.GetCurrentClassLogger();
+            logger.Info("Stock Test Example Start");
+            try
+            {
+                var config = new ConfigurationBuilder()
+                   .SetBasePath(System.IO.Directory.GetCurrentDirectory()) //From NuGet Package Microsoft.Extensions.Configuration.Json
+                   .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                   .Build();
+
+                var servicesProvider = BuildDi(config);
+                using (servicesProvider as IDisposable)
+                {
+                    var historyBuilder = servicesProvider.GetRequiredService<HistoryBuilder>();
+                    var stockInfoBuilder = servicesProvider.GetRequiredService<StockInfoBuilder>();
+                    var listBuilder = servicesProvider.GetRequiredService<TSEOTCListBuilder>();
+
+                    var tseHistory = historyBuilder.GetStockHistories("9911", new DateTime(2017, 12, 1), StockType.TSE);
+                    var otcHistory = historyBuilder.GetStockHistories("3088", new DateTime(2017, 12, 1), StockType.OTC);
+
+                    var OTCList = listBuilder.GetOTCList();
+                    var searchStockList = new string[] { "2439", "2330", "2317" };
+                    var queries = searchStockList.Select(
+                                x => OTCList.Contains(x) ? (StockType.OTC, x) : (StockType.TSE, x)
+                            ).ToArray();
+
+                    var stockInfos = await stockInfoBuilder.GetStocksInfo(queries);
+                }
+            }
+            catch (Exception ex)
+            {
+                // NLog: catch any exception and log it.
+                logger.Error(ex, "Stopped program because of exception");
+                throw;
+            }
+            finally
+            {
+                logger.Info("Stock Test Example End");
+                // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
+                LogManager.Shutdown();
+            }
+        }
+        private static IServiceProvider BuildDi(IConfiguration config)
+        {
+            return new ServiceCollection()
+               .AddTransient<HistoryBuilder>()
+               .AddTransient<StockInfoBuilder>()
+               .AddTransient<TSEOTCListBuilder>()
+               .AddLogging(loggingBuilder =>
+               {
+                   // configure Logging with NLog
+                   loggingBuilder.ClearProviders();
+                   loggingBuilder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
+                   loggingBuilder.AddNLog(config);
+               })
+               .BuildServiceProvider();
         }
     }
 }

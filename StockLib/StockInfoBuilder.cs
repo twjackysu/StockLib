@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 using StockLib.DateTimeExtension;
 using StockLib.EnumExtension;
 using System;
@@ -10,35 +11,61 @@ namespace StockLib
 {
     public class StockInfoBuilder : IStockInfoBuilder
     {
-        public async Task<List<StockInfo>> GetStocksInfo(bool needHistory, params (StockType type, string stockNo)[] queries)
+        private readonly ILogger<StockInfoBuilder> logger;
+        public StockInfoBuilder(ILogger<StockInfoBuilder> logger)
         {
-            if (queries.Length < 1)
-                return new List<StockInfo>();
-            var keys = new List<string>();
-            foreach (var query in queries)
-            {
-                if (string.IsNullOrEmpty(query.stockNo))
-                    continue;
-                keys.Add($"{query.type.ToKey(query.stockNo)}");
-            }
-            var stockList = string.Join("%257c", keys);
-            return await GetStockInfo(stockList, needHistory);
+            this.logger = logger;
         }
-        public async Task<List<StockInfo>> GetStocksInfo(bool needHistory, Dictionary<string, StockType> queries)
+        public async Task<List<StockInfo>> GetStocksInfo(params (StockType type, string stockNo)[] queries)
         {
-            if (queries.Count < 1)
-                return new List<StockInfo>();
-            var keys = new List<string>();
-            foreach (var query in queries)
+            try
             {
-                if (string.IsNullOrEmpty(query.Key))
-                    continue;
-                keys.Add($"{query.Value.ToKey(query.Key)}");
+                if (queries.Length < 1)
+                    return new List<StockInfo>();
+                var keys = new List<string>();
+                foreach (var query in queries)
+                {
+                    if (string.IsNullOrEmpty(query.stockNo))
+                        continue;
+                    keys.Add(query.type.ToKey(query.stockNo));
+                }
+                var stockList = string.Join("%257c", keys);
+                return await GetStockInfo(stockList);
             }
-            var stockList = string.Join("%257c", keys);
-            return await GetStockInfo(stockList, needHistory);
+            catch(Exception e)
+            {
+                var queriesParaStr = $"[({string.Join("),(", queries.Select(x => $"{x.type}, {x.stockNo}"))})]";
+                logger.LogError(e, $"Error when GetStockInfo({queriesParaStr})");
+                return null;
+            }
         }
-        private async Task<List<StockInfo>> GetStockInfo(string stockList, bool needHistory)
+        public async Task<List<StockInfo>> GetStocksInfo(Dictionary<string, StockType> queries, DateTime? SpecifiedDate = null)
+        {
+            try
+            {
+                if (queries.Count < 1)
+                    return new List<StockInfo>();
+                var keys = new List<string>();
+                foreach (var query in queries)
+                {
+                    if (string.IsNullOrEmpty(query.Key))
+                        continue;
+                    var key = SpecifiedDate.HasValue ? $"{query.Value.ToKey(query.Key)}_{SpecifiedDate.Value:yyyyMMdd}" : query.Value.ToKey(query.Key);
+                    keys.Add(key);
+                }
+                var stockList = string.Join("%257c", keys);
+                return await GetStockInfo(stockList);
+            }
+            catch (Exception e)
+            {
+                var queriesParaStr = $"{{{string.Join(",", queries.Select(x => $"{x.Key}: {x.Value}"))}}}";
+                var dataParaStr = SpecifiedDate.HasValue ? SpecifiedDate.Value.ToString("yyyyMMdd") : null;
+                logger.LogError(e, $"Error when GetStockInfo({queriesParaStr}, {dataParaStr})");
+                return null;
+            }
+        }
+
+        public async Task<List<StockInfo>> GetStockInfo(string stockList)
         {
             using (var httpClient = new System.Net.Http.HttpClient())
             {
@@ -69,17 +96,13 @@ namespace StockLib
                         stockInfo.YesterdayClosingPrice = Convert.ToSingle(item["y"]);
                         stockInfo.LimitUp = Convert.ToSingle(item["u"]);
                         stockInfo.LimitDown = Convert.ToSingle(item["w"]);
-                        if (needHistory)
-                        {
-                            var historyBuilder = new HistoryBuilder();
-                            stockInfo.StockHistory = historyBuilder.GetStockHistories(stockInfo.No, DateTime.UtcNow, stockInfo.Type);
-                        }
                         result.Add(stockInfo);
                     }
                     return result;
                 }
                 catch (Exception e)
                 {
+                    logger.LogError(e, $"Error when GetStockInfo({stockList})");
                     return null;
                 }
             }

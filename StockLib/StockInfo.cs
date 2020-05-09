@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace StockLib
 {
@@ -37,7 +36,5 @@ namespace StockLib
         public float LimitUp { get; set; }
         /// <summary>跌停點</summary>
         public float LimitDown { get; set; }
-        /// <summary>當月和上一個月的股票資訊</summary>
-        public StockHistory[] StockHistory { get; set; }
     }
 }
