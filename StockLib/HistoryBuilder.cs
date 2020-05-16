@@ -26,7 +26,15 @@ namespace StockLib
                         var tpex = JsonConvert.DeserializeObject<TPEXAPIModel>(tGetData);
                         foreach (var data in tpex.aaData)
                         {
-                            result.Add(new StockHistory(data));
+                            try
+                            {
+                                var history = new StockHistory(data);
+                                result.Add(history);
+                            }
+                            catch (Exception e)
+                            {
+                                logger.LogWarning(e, $"new StockHistory Error. GetStockHistories({stockNo}, {dateTime:yyyy-MM}, {type}). Data: {JsonConvert.SerializeObject(data)}");
+                            }
                         }
                         break;
                     case StockType.TSE:
@@ -34,7 +42,15 @@ namespace StockLib
                         var twse = JsonConvert.DeserializeObject<TWSEAPIModel>(tGetData);
                         foreach (var data in twse.data)
                         {
-                            result.Add(new StockHistory(data));
+                            try
+                            {
+                                var history = new StockHistory(data);
+                                result.Add(history);
+                            }
+                            catch (Exception e)
+                            {
+                                logger.LogWarning(e, $"new StockHistory Error. GetStockHistories({stockNo}, {dateTime:yyyy-MM}, {type}). Data: {JsonConvert.SerializeObject(data)}");
+                            }
                         }
                         break;
                 }

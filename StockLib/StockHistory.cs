@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace StockLib
 {
@@ -7,7 +8,9 @@ namespace StockLib
     {
         public StockHistory(List<string> data)
         {
-            Date = Convert.ToDateTime(data[0].Replace(",", "")).AddYears(1911);
+            var date = data[0].Replace(",", "").Replace("＊", "").Split('/').Select(x => Convert.ToInt32(x)).ToList();
+
+            Date = new DateTime(date[0]+1911, date[1], date[2]);
             TradeVolume = Convert.ToUInt32(data[1].Replace(",", ""));
             TurnOverInValue = Convert.ToDecimal(data[2].Replace(",", ""));
             OpeningPrice = Convert.ToDecimal(data[3].Replace(",", ""));

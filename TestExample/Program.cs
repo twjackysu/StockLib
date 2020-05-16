@@ -31,8 +31,8 @@ namespace TestExample
                     var stockInfoBuilder = servicesProvider.GetRequiredService<StockInfoBuilder>();
                     var listBuilder = servicesProvider.GetRequiredService<TSEOTCListBuilder>();
 
-                    var tseHistory = historyBuilder.GetStockHistories("9911", new DateTime(2017, 12, 1), StockType.TSE);
-                    var otcHistory = historyBuilder.GetStockHistories("3088", new DateTime(2017, 12, 1), StockType.OTC);
+                    var tseHistory = await historyBuilder.GetStockHistories("1101", new DateTime(2017, 4, 1), StockType.TSE);
+                    var otcHistory = await historyBuilder.GetStockHistories("5015", new DateTime(2000, 11, 1), StockType.OTC);
 
                     var OTCList = listBuilder.GetOTCList();
                     var searchStockList = new string[] { "2439", "2330", "2317" };
