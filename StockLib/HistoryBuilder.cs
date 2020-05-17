@@ -55,9 +55,14 @@ namespace StockLib
                         break;
                 }
             }
-            catch (AggregateException e)
+            catch (Exception e)
             {
                 logger.LogError(e, $"Error when GetStockHistories({stockNo}, {dateTime:yyyy-MM}, {type})");
+                if(e is HttpRequestException)
+                {
+                    //IP被鎖
+                    throw e;
+                }
             }
             return result.ToArray();
         }
