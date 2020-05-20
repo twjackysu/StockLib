@@ -40,16 +40,23 @@ namespace StockLib
                     case StockType.TSE:
                         tGetData = await GetTWSEData(stockNo, dateTime);
                         var twse = JsonConvert.DeserializeObject<TWSEAPIModel>(tGetData);
-                        foreach (var data in twse.data)
+                        if (twse.data == null)
                         {
-                            try
+                            logger.LogWarning($"No Data. GetStockHistories({stockNo}, {dateTime:yyyy-MM}, {type})");
+                        }
+                        else
+                        {
+                            foreach (var data in twse.data)
                             {
-                                var history = new StockHistory(data);
-                                result.Add(history);
-                            }
-                            catch (Exception e)
-                            {
-                                logger.LogWarning(e, $"new StockHistory Error. GetStockHistories({stockNo}, {dateTime:yyyy-MM}, {type}). Data: {JsonConvert.SerializeObject(data)}");
+                                try
+                                {
+                                    var history = new StockHistory(data);
+                                    result.Add(history);
+                                }
+                                catch (Exception e)
+                                {
+                                    logger.LogWarning(e, $"new StockHistory Error. GetStockHistories({stockNo}, {dateTime:yyyy-MM}, {type}). Data: {JsonConvert.SerializeObject(data)}");
+                                }
                             }
                         }
                         break;
