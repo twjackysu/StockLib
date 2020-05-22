@@ -20,7 +20,7 @@ namespace StockLib
             //.Net Core need Nuget: System.Text.Encoding.CodePages
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         }
-        public HashSet<string> GetOTCList()
+        public Dictionary<string, string> GetOTCList()
         {
             try
             {
@@ -30,9 +30,9 @@ namespace StockLib
                 IHtmlDocument doc = parser.ParseDocument(html);
                 IEnumerable<IElement> element = doc.QuerySelectorAll("body > table.h4 > tbody > tr > td:nth-child(1)[bgcolor='#FAFAD2']:not([colspan='7'])");
 
-                return element.Where(x => !(x.TextContent[x.TextContent.Length - 3] == '購' || x.TextContent[x.TextContent.Length - 3] == '售')).Select(x => {
-                    var splitStr = x.TextContent.Split('　'); return splitStr[0];
-                }).ToHashSet();
+                return element.Where(x => !(x.TextContent[x.TextContent.Length - 3] == '購' || x.TextContent[x.TextContent.Length - 3] == '售'))
+                    .Select(x => x.TextContent.Split('　'))
+                    .ToDictionary(x => x[0], x => x[1]);
             }
             catch (Exception e)
             {
@@ -40,7 +40,7 @@ namespace StockLib
                 return null;
             }
         }
-        public HashSet<string> GetTSEList()
+        public Dictionary<string, string> GetTSEList()
         {
             try
             {
@@ -50,9 +50,9 @@ namespace StockLib
                 IHtmlDocument doc = parser.ParseDocument(html);
                 IEnumerable<IElement> element = doc.QuerySelectorAll("body > table.h4 > tbody > tr > td:nth-child(1)[bgcolor='#FAFAD2']:not([colspan='7'])");
             
-                return element.Where(x => !(x.TextContent[x.TextContent.Length-3] == '購' || x.TextContent[x.TextContent.Length - 3] == '售')).Select(x => {
-                    var splitStr = x.TextContent.Split('　'); return splitStr[0];
-                }).ToHashSet();
+                return element.Where(x => !(x.TextContent[x.TextContent.Length-3] == '購' || x.TextContent[x.TextContent.Length - 3] == '售'))
+                    .Select(x => x.TextContent.Split('　'))
+                    .ToDictionary(x => x[0], x => x[1]);
             }
             catch (Exception e)
             {

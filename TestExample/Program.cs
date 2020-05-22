@@ -34,10 +34,11 @@ namespace TestExample
                     var tseHistory = await historyBuilder.GetStockHistories("1101", new DateTime(2017, 4, 1), StockType.TSE);
                     var otcHistory = await historyBuilder.GetStockHistories("5015", new DateTime(2000, 11, 1), StockType.OTC);
 
+                    var TSEList = listBuilder.GetTSEList();
                     var OTCList = listBuilder.GetOTCList();
                     var searchStockList = new string[] { "2439", "2330", "2317" };
                     var queries = searchStockList.Select(
-                                x => OTCList.Contains(x) ? (StockType.OTC, x) : (StockType.TSE, x)
+                                x => OTCList.ContainsKey(x) ? (StockType.OTC, x) : (StockType.TSE, x)
                             ).ToArray();
 
                     var stockInfos = await stockInfoBuilder.GetStocksInfo(queries);

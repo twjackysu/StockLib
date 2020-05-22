@@ -4,7 +4,7 @@ namespace StockLib
 {
     public interface ITSEOTCListBuilder
     {
-        HashSet<string> GetOTCList();
-        HashSet<string> GetTSEList();
+        Dictionary<string, string> GetOTCList();
+        Dictionary<string, string> GetTSEList();
     }
 }
