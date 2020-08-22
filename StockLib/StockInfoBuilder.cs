@@ -16,12 +16,12 @@ namespace StockLib
         {
             this.logger = logger;
         }
-        public async Task<List<StockInfo>> GetStocksInfo(params (StockType type, string stockNo)[] queries)
+        public async Task<Dictionary<string, StockInfo>> GetStocksInfo(params (StockType type, string stockNo)[] queries)
         {
             try
             {
                 if (queries.Length < 1)
-                    return new List<StockInfo>();
+                    return new Dictionary<string, StockInfo>();
                 var keys = new List<string>();
                 foreach (var query in queries)
                 {
@@ -39,12 +39,12 @@ namespace StockLib
                 return null;
             }
         }
-        public async Task<List<StockInfo>> GetStocksInfo(Dictionary<string, StockType> queries, DateTime? SpecifiedDate = null)
+        public async Task<Dictionary<string, StockInfo>> GetStocksInfo(Dictionary<string, StockType> queries, DateTime? SpecifiedDate = null)
         {
             try
             {
                 if (queries.Count < 1)
-                    return new List<StockInfo>();
+                    return new Dictionary<string, StockInfo>();
                 var keys = new List<string>();
                 foreach (var query in queries)
                 {
@@ -65,7 +65,7 @@ namespace StockLib
             }
         }
 
-        public async Task<List<StockInfo>> GetStockInfo(string stockList)
+        private async Task<Dictionary<string, StockInfo>> GetStockInfo(string stockList)
         {
             using (var httpClient = new System.Net.Http.HttpClient())
             {
@@ -74,7 +74,7 @@ namespace StockLib
                 {
                     var jObj = JObject.Parse(json);
                     var jArray = jObj["msgArray"] as JArray;
-                    var result = new List<StockInfo>();
+                    var result = new Dictionary<string, StockInfo>();
                     foreach (JObject item in jArray)
                     {
                         var stockInfo = new StockInfo();
@@ -96,7 +96,7 @@ namespace StockLib
                         stockInfo.YesterdayClosingPrice = Convert.ToSingle(item["y"]);
                         stockInfo.LimitUp = Convert.ToSingle(item["u"]);
                         stockInfo.LimitDown = Convert.ToSingle(item["w"]);
-                        result.Add(stockInfo);
+                        result.Add(stockInfo.No, stockInfo);
                     }
                     return result;
                 }
