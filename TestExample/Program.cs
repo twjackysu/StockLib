@@ -29,16 +29,15 @@ namespace TestExample
                 {
                     var historyBuilder = servicesProvider.GetRequiredService<HistoryBuilder>();
                     var stockInfoBuilder = servicesProvider.GetRequiredService<StockInfoBuilder>();
-                    var listBuilder = servicesProvider.GetRequiredService<TSEOTCListBuilder>();
+                    var listBuilder = servicesProvider.GetRequiredService<StockListBuilderFromWeb>();
 
-                    var tseHistory = await historyBuilder.GetStockHistories("1101", new DateTime(2017, 4, 1), StockType.TSE);
+                    var tseHistory = await historyBuilder.GetStockHistories("1101", new DateTime(2020, 4, 1), StockType.TSE);
                     var otcHistory = await historyBuilder.GetStockHistories("5015", new DateTime(2000, 11, 1), StockType.OTC);
 
-                    var TSEList = listBuilder.GetTSEList();
-                    var OTCList = listBuilder.GetOTCList();
-                    var searchStockList = new string[] { "2439", "2330", "2317" };
+                    var stockList = await listBuilder.GetAllStockListAsync();
+                    var searchStockList = new string[] { "2439", "2330", "2317", "3679", "3548", "4942" };
                     var queries = searchStockList.Select(
-                                x => OTCList.ContainsKey(x) ? (StockType.OTC, x) : (StockType.TSE, x)
+                                x => (stockList[x].Type, x)
                             ).ToArray();
 
                     var stockInfos = await stockInfoBuilder.GetStocksInfo(queries);
@@ -62,7 +61,7 @@ namespace TestExample
             return new ServiceCollection()
                .AddTransient<HistoryBuilder>()
                .AddTransient<StockInfoBuilder>()
-               .AddTransient<TSEOTCListBuilder>()
+               .AddTransient<StockListBuilderFromWeb>()
                .AddLogging(loggingBuilder =>
                {
                    // configure Logging with NLog

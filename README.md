@@ -8,29 +8,31 @@ ___
 new ServiceCollection()
 .AddTransient<IHistoryBuilder, HistoryBuilder>()
 .AddTransient<IStockInfoBuilder, StockInfoBuilder>()
-.AddTransient<ITSEOTCListBuilder, TSEOTCListBuilder>()
+.AddTransient<IStockListBuilder, StockListBuilderFromWeb>()
 ```
 在任何你的Class內使用
 ```C#
 class YourClass
 {
     private readonly IHistoryBuilder historyBuilder;
-    private readonly ITSEOTCListBuilder tseOTCListBuilder;
+    private readonly StockListBuilderFromWeb stockListBuilder;
     private readonly IStockInfoBuilder stockInfoBuilder;
-    public YourClass(IHistoryBuilder historyBuilder, ITSEOTCListBuilder tseOTCListBuilder, IStockInfoBuilder stockInfoBuilder)
+    public YourClass(IHistoryBuilder historyBuilder, StockListBuilderFromWeb stockListBuilder, IStockInfoBuilder stockInfoBuilder)
     {
         this.historyBuilder = historyBuilder;
-        this.tseOTCListBuilder = tseOTCListBuilder;
+        this.stockListBuilder = stockListBuilder;
         this.stockInfoBuilder = stockInfoBuilder;
     }
 }
 ```
 獲得目前上市與上櫃的代碼列表
 ```C#
+//目前所有上市+上櫃公司清單
+var allStockList = await stockListBuilder.GetAllStockListAsync();
 //目前所有上市公司清單
-var TSEList = tseOTCListBuilder.GetTSEList();
+var tseList = await stockListBuilder.GetTSEListAsync();
 //目前所有上櫃公司清單
-var OTCList = tseOTCListBuilder.GetOTCList();
+var otcList = await stockListBuilder.GetOTCListAsync();
 ```
 
 使用HistoryBuilder來搜尋歷史股價資訊，一次只能查一支股票一個月的資訊(datatime的日期無視)

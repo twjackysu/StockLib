@@ -2,11 +2,8 @@
 
 namespace StockLib
 {
-    public class StockInfo
+    public class StockInfo : Stock
     {
-        public string No { get; set; }
-        public StockType Type { get; set; }
-        public string Name { get; set; }
         public string FullName { get; set; }
         /// <summary>最新成交價/summary>
         public float? LastTradedPrice { get; set; }
