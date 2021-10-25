@@ -32,7 +32,7 @@ namespace TestExample
                     var listBuilder = servicesProvider.GetRequiredService<StockListBuilderFromWeb>();
 
                     var tseHistory = await historyBuilder.GetStockHistories("1101", new DateTime(2020, 4, 1), StockType.TSE);
-                    var otcHistory = await historyBuilder.GetStockHistories("5015", new DateTime(2000, 11, 1), StockType.OTC);
+                    var otcHistory = await historyBuilder.GetStockHistories("5015", new DateTime(2019, 11, 1), StockType.OTC);
 
                     var stockList = await listBuilder.GetAllStockListAsync();
                     var searchStockList = new string[] { "2439", "2330", "2317", "3679", "3548", "4942" };
