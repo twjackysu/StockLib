@@ -42,7 +42,7 @@ namespace StockLib
         {
             try
             {
-                var url = "http://isin.twse.com.tw/isin/C_public.jsp?strMode=4";
+                var url = "https://isin.twse.com.tw/isin/C_public.jsp?strMode=4";
                 var html = await GetHtmlAsync(url);
                 HtmlParser parser = new HtmlParser();
                 IHtmlDocument doc = parser.ParseDocument(html);
@@ -62,7 +62,7 @@ namespace StockLib
         {
             try
             {
-                var url = "http://isin.twse.com.tw/isin/C_public.jsp?strMode=2";
+                var url = "https://isin.twse.com.tw/isin/C_public.jsp?strMode=2";
                 var html = await GetHtmlAsync(url);
                 HtmlParser parser = new HtmlParser();
                 IHtmlDocument doc = parser.ParseDocument(html);
