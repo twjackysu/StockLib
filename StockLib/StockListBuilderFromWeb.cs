@@ -2,19 +2,16 @@
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace StockLib
 {
     public class StockListBuilderFromWeb : IStockListBuilder
     {
         private readonly ILogger<StockListBuilderFromWeb> logger;
+        private static readonly HttpClient httpClient = new HttpClient();
+
         public StockListBuilderFromWeb(ILogger<StockListBuilderFromWeb> logger)
         {
             this.logger = logger;
@@ -82,8 +79,10 @@ namespace StockLib
         {
             try
             {
-                using var web1 = new WebClient();
-                var raw = await web1.DownloadDataTaskAsync(url);
+                var response = await httpClient.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+
+                var raw = await response.Content.ReadAsByteArrayAsync();
                 var htmlCode = Encoding.GetEncoding(950).GetString(raw);
                 return htmlCode;
             }

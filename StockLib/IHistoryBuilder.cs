@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-
-namespace StockLib
+﻿namespace StockLib
 {
     public interface IHistoryBuilder
     {

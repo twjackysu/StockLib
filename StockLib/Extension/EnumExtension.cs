@@ -1,5 +1,4 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace StockLib.EnumExtension
 {
@@ -7,17 +6,14 @@ namespace StockLib.EnumExtension
     {
         public static string ToKey(this Enum @enum, string stockNo)
         {
-            MemberInfo[] memberInfo = @enum.GetType().GetMember(@enum.ToString());
+            Type enumType = @enum.GetType();
+            MemberInfo[] memberInfo = enumType.GetMember(@enum.ToString());
 
-            if (memberInfo != null && memberInfo.Length > 0)
-            {
-                var attributes = memberInfo[0].GetCustomAttributes(typeof(StockKeyAttribute), false);
-                if (attributes != null && attributes.Length > 0)
-                {
-                    return ((StockKeyAttribute)attributes[0])?.Key.Replace("{StockNo}", stockNo);
-                }
-            }
-            return null;
+            var attribute = memberInfo.FirstOrDefault()?
+                .GetCustomAttributes(typeof(StockKeyAttribute), false)
+                .FirstOrDefault() as StockKeyAttribute;
+
+            return attribute?.Key.Replace("{StockNo}", stockNo);
         }
     }
 }

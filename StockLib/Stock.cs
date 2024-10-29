@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace StockLib
+﻿namespace StockLib
 {
     public class Stock
     {
-        public string No { get; set; }
-        public string Name { get; set; }
-        public StockType Type { get; set; }
+        public required string No { get; set; }
+        public required string Name { get; set; }
+        public required StockType Type { get; set; }
     }
 }

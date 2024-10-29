@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace StockLib
+﻿namespace StockLib
 {
     [AttributeUsage(AttributeTargets.Field)]
     public class StockKeyAttribute : Attribute

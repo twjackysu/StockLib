@@ -1,9 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace StockLib
 {
@@ -24,7 +20,8 @@ namespace StockLib
                     case StockType.OTC:
                         var tGetData = await GetTPEXData(stockNo, dateTime);
                         var tpex = JsonConvert.DeserializeObject<TPEXAPIModel>(tGetData);
-                        foreach (var data in tpex.aaData)
+                        var firstTable = tpex.tables.FirstOrDefault();
+                        foreach (var data in firstTable.data)
                         {
                             try
                             {
@@ -68,7 +65,7 @@ namespace StockLib
                 if(e is HttpRequestException)
                 {
                     //IP被鎖
-                    throw e;
+                    throw;
                 }
             }
             return result.ToArray();
@@ -87,8 +84,9 @@ namespace StockLib
         {
             using (var client = new HttpClient())
             {
-                var dateMonthStr = $"{dateTime.Year - 1911}/{dateTime.Month}";
-                var url = $"http://www.tpex.org.tw/web/stock/aftertrading/daily_trading_info/st43_result.php?l=zh-tw&d={dateMonthStr}&stkno={stockNo}";
+                // TODO: 去https://www.tpex.org.tw/zh-tw/mainboard/trading/info/stock-pricing.html
+                // 改成用https://www.tpex.org.tw/www/zh-tw/afterTrading/tradingStock
+                var url = $"http://www.tpex.org.tw/www/zh-tw/afterTrading/tradingStock/st43_result.php?l=zh-tw&date={dateTime.ToString("yyyy/MM/dd")}&code={stockNo}";
                 return await client.GetStringAsync(url);
             }
         }
@@ -104,12 +102,24 @@ namespace StockLib
     }
     public class TPEXAPIModel
     {
-        public string stkNo { get; set; }
-        public string stkName { get; set; }
+        public List<Table> tables { get; set; }
+        public string date { get; set; }
+        public string code { get; set; }
+        public string name { get; set; }
         public bool showListPriceNote { get; set; }
         public bool showListPriceLink { get; set; }
-        public string reportDate { get; set; }
-        public int iTotalRecords { get; set; }
-        public List<List<string>> aaData { get; set; }
+        public string stat { get; set; }
+
+        public class Table
+        {
+            public string title { get; set; }
+            public string subtitle { get; set; }
+            public string date { get; set; }
+            public List<List<string>> data { get; set; }
+            public List<string> fields { get; set; }
+            public List<string> notes { get; set; }
+            public int totalCount { get; set; }
+            public List<string> summary { get; set; }
+        }
     }
 }

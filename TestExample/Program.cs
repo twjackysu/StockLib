@@ -31,10 +31,11 @@ namespace TestExample
                     var stockInfoBuilder = servicesProvider.GetRequiredService<StockInfoBuilder>();
                     var listBuilder = servicesProvider.GetRequiredService<StockListBuilderFromWeb>();
 
-                    var tseHistory = await historyBuilder.GetStockHistories("1101", new DateTime(2020, 4, 1), StockType.TSE);
-                    var otcHistory = await historyBuilder.GetStockHistories("5015", new DateTime(2019, 11, 1), StockType.OTC);
+                    var tseHistory = await historyBuilder.GetStockHistories("006208", new DateTime(2019, 11, 1), StockType.TSE);
+                    var otcHistory = await historyBuilder.GetStockHistories("00687B", new DateTime(2023, 11, 1), StockType.OTC);
 
                     var stockList = await listBuilder.GetAllStockListAsync();
+                    
                     var searchStockList = new string[] { "2439", "2330", "2317", "3679", "3548", "4942" };
                     var queries = searchStockList.Select(
                                 x => (stockList[x].Type, x)
