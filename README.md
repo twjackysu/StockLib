@@ -1,6 +1,6 @@
-# StockLib
+# TWStockLib
 
-StockLib 是一個用於獲取台灣股市資料的 .NET 類別庫。它提供了獲取股票清單、歷史數據和即時報價的功能，並支援價格變化的觀察者模式。
+TWStockLib 是一個用於獲取台灣股市資料的 .NET 類別庫。它提供了獲取股票清單、歷史數據和即時報價的功能，並支援價格變化的觀察者模式。
 
 ## 功能特點
 
@@ -15,11 +15,11 @@ StockLib 是一個用於獲取台灣股市資料的 .NET 類別庫。它提供�
 
 ### 步驟 1: 註冊服務
 
-在 `Program.cs` 或 `Startup.cs` 中註冊 StockLib 服務：
+在 `Program.cs` 或 `Startup.cs` 中註冊 TWStockLib 服務：
 
 ```csharp
 using Microsoft.Extensions.DependencyInjection;
-using StockLib.Services;
+using TWStockLib.Services;
 using System.Text;
 
 // 註冊編碼提供者，以支援 950 (繁體中文 Big5) 編碼
@@ -27,7 +27,7 @@ Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
 var services = new ServiceCollection();
 
-// 添加 StockLib 服務
+// 添加 TWStockLib 服務
 services.AddStockServices();
 
 var serviceProvider = services.BuildServiceProvider();
@@ -137,9 +137,9 @@ stockMarketService.UnsubscribePriceChanges("2330", observer);
 
 ```csharp
 using Microsoft.Extensions.DependencyInjection;
-using StockLib.Models;
-using StockLib.Observer;
-using StockLib.Services;
+using TWStockLib.Models;
+using TWStockLib.Observer;
+using TWStockLib.Services;
 using System;
 using System.Linq;
 using System.Text;

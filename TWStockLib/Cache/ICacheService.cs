@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace StockLib.Cache
+namespace TWStockLib.Cache
 {
     public interface ICacheService
     {

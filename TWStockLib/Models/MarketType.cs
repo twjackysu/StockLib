@@ -1,4 +1,4 @@
-namespace StockLib.Models
+namespace TWStockLib.Models
 {
     public enum MarketType
     {

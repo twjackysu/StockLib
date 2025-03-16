@@ -1,7 +1,7 @@
-using StockLib.Observer;
-using StockLib.Strategy;
+using TWStockLib.Observer;
+using TWStockLib.Strategy;
 
-namespace StockLib.Factory
+namespace TWStockLib.Factory
 {
     public interface IStockMarketFactory
     {

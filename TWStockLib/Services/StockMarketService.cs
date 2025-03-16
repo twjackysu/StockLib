@@ -1,12 +1,12 @@
-using StockLib.Factory;
-using StockLib.Models;
-using StockLib.Observer;
-using StockLib.Strategy;
+using TWStockLib.Factory;
+using TWStockLib.Models;
+using TWStockLib.Observer;
+using TWStockLib.Strategy;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace StockLib.Services
+namespace TWStockLib.Services
 {
     public class StockMarketService
     {

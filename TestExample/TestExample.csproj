@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\StockLib\StockLib.csproj" />
+    <ProjectReference Include="..\TWStockLib\TWStockLib.csproj" />
   </ItemGroup>
 
   <ItemGroup>

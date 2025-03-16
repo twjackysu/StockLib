@@ -1,7 +1,7 @@
-﻿using StockLib.Models;
+﻿using TWStockLib.Models;
 using System.Reflection;
 
-namespace StockLib.EnumExtension
+namespace TWStockLib.EnumExtension
 {
     public static class EnumExtension
     {

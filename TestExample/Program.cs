@@ -3,13 +3,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NLog;
 using NLog.Extensions.Logging;
-using StockLib.Models;
-using StockLib.Observer;
-using StockLib.Services;
-using System;
-using System.Linq;
+using TWStockLib.Models;
+using TWStockLib.Observer;
+using TWStockLib.Services;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace TestExample
 {

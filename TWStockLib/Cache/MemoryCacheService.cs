@@ -2,7 +2,7 @@ using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Threading.Tasks;
 
-namespace StockLib.Cache
+namespace TWStockLib.Cache
 {
     public class MemoryCacheService : ICacheService
     {

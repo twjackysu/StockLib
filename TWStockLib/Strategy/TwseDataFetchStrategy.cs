@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
-using StockLib.Cache;
-using StockLib.Models;
+using TWStockLib.Cache;
+using TWStockLib.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +12,7 @@ using AngleSharp.Html.Parser;
 using AngleSharp.Dom;
 using Newtonsoft.Json;
 
-namespace StockLib.Strategy
+namespace TWStockLib.Strategy
 {
     public class TwseDataFetchStrategy : IDataFetchStrategy
     {

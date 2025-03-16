@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2026
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockLib", "StockLib\StockLib.csproj", "{B42AD561-2055-424F-B935-AC1505F8930B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TWStockLib", "TWStockLib\TWStockLib.csproj", "{B42AD561-2055-424F-B935-AC1505F8930B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestExample", "TestExample\TestExample.csproj", "{B0BB6689-91F0-43A2-9A7F-84214A19E0CC}"
 EndProject

@@ -1,4 +1,4 @@
-namespace StockLib.Observer
+namespace TWStockLib.Observer
 {
     public interface IStockPriceObserver
     {

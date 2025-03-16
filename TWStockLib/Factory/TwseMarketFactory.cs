@@ -1,11 +1,11 @@
 using Microsoft.Extensions.Logging;
-using StockLib.Cache;
-using StockLib.Observer;
-using StockLib.Strategy;
+using TWStockLib.Cache;
+using TWStockLib.Observer;
+using TWStockLib.Strategy;
 using System;
 using System.Net.Http;
 
-namespace StockLib.Factory
+namespace TWStockLib.Factory
 {
     public class TwseMarketFactory : IStockMarketFactory
     {

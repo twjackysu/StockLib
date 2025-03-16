@@ -1,9 +1,9 @@
-using StockLib.Models;
+using TWStockLib.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace StockLib.Strategy
+namespace TWStockLib.Strategy
 {
     public interface IDataFetchStrategy
     {

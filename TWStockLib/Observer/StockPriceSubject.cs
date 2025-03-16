@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace StockLib.Observer
+namespace TWStockLib.Observer
 {
     public class StockPriceSubject
     {

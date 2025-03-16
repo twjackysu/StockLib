@@ -1,8 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
-using StockLib.Cache;
-using StockLib.Factory;
+using TWStockLib.Cache;
+using TWStockLib.Factory;
 
-namespace StockLib.Services
+namespace TWStockLib.Services
 {
     public static class ServiceCollectionExtensions
     {
