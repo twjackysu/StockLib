@@ -1,12 +1,12 @@
-﻿namespace StockLib
+namespace StockLib.Models
 {
     [AttributeUsage(AttributeTargets.Field)]
-    public class StockKeyAttribute : Attribute
+    public class MarketKeyAttribute : Attribute
     {
         public string Key;
-        public StockKeyAttribute(string key)
+        public MarketKeyAttribute(string key)
         {
             Key = key;
         }
     }
-}
+} 

@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using StockLib.Models;
+using System.Reflection;
 
 namespace StockLib.EnumExtension
 {
@@ -10,8 +11,8 @@ namespace StockLib.EnumExtension
             MemberInfo[] memberInfo = enumType.GetMember(@enum.ToString());
 
             var attribute = memberInfo.FirstOrDefault()?
-                .GetCustomAttributes(typeof(StockKeyAttribute), false)
-                .FirstOrDefault() as StockKeyAttribute;
+                .GetCustomAttributes(typeof(MarketKeyAttribute), false)
+                .FirstOrDefault() as MarketKeyAttribute;
 
             return attribute?.Key.Replace("{StockNo}", stockNo);
         }

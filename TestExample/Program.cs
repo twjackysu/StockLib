@@ -3,9 +3,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NLog;
 using NLog.Extensions.Logging;
-using StockLib;
+using StockLib.Models;
+using StockLib.Observer;
+using StockLib.Services;
 using System;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace TestExample
@@ -14,34 +17,84 @@ namespace TestExample
     {
         static async Task Main(string[] args)
         {
-
+            // 註冊編碼提供者，以支援 950 (繁體中文 Big5) 編碼
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            
             var logger = LogManager.GetCurrentClassLogger();
             logger.Info("Stock Test Example Start");
             try
             {
                 var config = new ConfigurationBuilder()
-                   .SetBasePath(System.IO.Directory.GetCurrentDirectory()) //From NuGet Package Microsoft.Extensions.Configuration.Json
+                   .SetBasePath(System.IO.Directory.GetCurrentDirectory())
                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                    .Build();
 
                 var servicesProvider = BuildDi(config);
                 using (servicesProvider as IDisposable)
                 {
-                    var historyBuilder = servicesProvider.GetRequiredService<HistoryBuilder>();
-                    var stockInfoBuilder = servicesProvider.GetRequiredService<StockInfoBuilder>();
-                    var listBuilder = servicesProvider.GetRequiredService<StockListBuilderFromWeb>();
+                    var stockMarketService = servicesProvider.GetRequiredService<StockMarketService>();
 
-                    var tseHistory = await historyBuilder.GetStockHistories("006208", new DateTime(2019, 11, 1), StockType.TSE);
-                    var otcHistory = await historyBuilder.GetStockHistories("00687B", new DateTime(2023, 11, 1), StockType.OTC);
-
-                    var stockList = await listBuilder.GetAllStockListAsync();
+                    // 創建一個價格觀察者
+                    var observer = stockMarketService.CreatePriceObserver("TestObserver");
                     
-                    var searchStockList = new string[] { "2439", "2330", "2317", "3679", "3548", "4942" };
-                    var queries = searchStockList.Select(
-                                x => (stockList[x].Type, x)
-                            ).ToArray();
+                    // 獲取股票清單
+                    logger.Info("獲取股票清單...");
+                    var allStocks = await stockMarketService.GetAllStockList();
+                    logger.Info($"總共獲取到 {allStocks.Count} 支股票");
 
-                    var stockInfos = await stockInfoBuilder.GetStocksInfo(queries);
+                    // 獲取歷史數據 006208
+                    logger.Info("獲取歷史數據...");
+                    var tseHistory = await stockMarketService.GetHistoricalData(
+                        "006208", 
+                        new DateTime(2019, 11, 1), 
+                        new DateTime(2019, 11, 30),
+                        MarketType.TSE);
+                    
+                    logger.Info($"006208 歷史數據: {tseHistory.Count()} 筆");
+
+                    // 獲取歷史數據 00687B
+                    logger.Info("嘗試獲取 00687B 的歷史數據...");
+                    var otcHistory = await stockMarketService.GetHistoricalData(
+                        "00687B", 
+                        new DateTime(2023, 11, 1), 
+                        new DateTime(2023, 11, 30),
+                        MarketType.OTC);
+                    
+                    logger.Info($"00687B 歷史數據: {otcHistory.Count()} 筆");
+                    
+                    // 獲取即時報價
+                    logger.Info("獲取即時報價...");
+                    var searchStockList = new string[] { "2439", "2330", "2317", "3679", "3548", "4942" };
+                    
+                    // 訂閱價格變化
+                    foreach (var symbol in searchStockList)
+                    {
+                        stockMarketService.SubscribePriceChanges(symbol, observer);
+                    }
+                    
+                    // 獲取即時報價
+                    foreach (var symbol in searchStockList)
+                    {
+                        var marketType = allStocks.TryGetValue(symbol, out var stock) 
+                            ? stock.Market 
+                            : MarketType.TSE;
+                            
+                        var quote = await stockMarketService.GetRealtimeQuote(symbol, marketType);
+                        if (quote != null)
+                        {
+                            logger.Info($"{symbol} {quote.Name} 目前價格: {quote.LastPrice}");
+                        }
+                        else
+                        {
+                            logger.Warn($"{symbol} 無法獲取報價");
+                        }
+                    }
+                    
+                    // 取消訂閱
+                    foreach (var symbol in searchStockList)
+                    {
+                        stockMarketService.UnsubscribePriceChanges(symbol, observer);
+                    }
                 }
             }
             catch (Exception ex)
@@ -57,20 +110,43 @@ namespace TestExample
                 LogManager.Shutdown();
             }
         }
+        
         private static IServiceProvider BuildDi(IConfiguration config)
         {
-            return new ServiceCollection()
-               .AddTransient<HistoryBuilder>()
-               .AddTransient<StockInfoBuilder>()
-               .AddTransient<StockListBuilderFromWeb>()
-               .AddLogging(loggingBuilder =>
-               {
-                   // configure Logging with NLog
-                   loggingBuilder.ClearProviders();
-                   loggingBuilder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
-                   loggingBuilder.AddNLog(config);
-               })
-               .BuildServiceProvider();
+            var services = new ServiceCollection();
+            
+            // 添加日誌
+            services.AddLogging(loggingBuilder =>
+            {
+                // configure Logging with NLog
+                loggingBuilder.ClearProviders();
+                loggingBuilder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
+                loggingBuilder.AddNLog(config);
+            });
+            
+            // 添加股票服務
+            services.AddStockServices();
+            
+            return services.BuildServiceProvider();
+        }
+    }
+    
+    // 自定義觀察者實現
+    public class TestObserver : IStockPriceObserver
+    {
+        private readonly ILogger<TestObserver> _logger;
+        
+        public TestObserver(ILogger<TestObserver> logger)
+        {
+            _logger = logger;
+        }
+        
+        public void OnPriceChanged(string symbol, decimal newPrice, decimal oldPrice)
+        {
+            var changePercentage = (newPrice - oldPrice) / oldPrice * 100;
+            var direction = newPrice > oldPrice ? "上漲" : "下跌";
+            
+            _logger.LogInformation($"股票 {symbol} {direction}: 從 {oldPrice} 到 {newPrice} ({changePercentage:F2}%)");
         }
     }
 }
