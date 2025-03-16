@@ -2,6 +2,17 @@
 
 TWStockLib 是一個用於獲取台灣股市資料的 .NET 類別庫。它提供了獲取股票清單、歷史數據和即時報價的功能，並支援價格變化的觀察者模式。
 
+## 安裝
+
+通過 NuGet 安裝 TWStockLib：
+
+```
+dotnet add package TWStockLib
+```
+
+或在 Visual Studio 的 NuGet 套件管理器中搜尋 `TWStockLib`。
+
+
 ## 功能特點
 
 - 獲取上市（TSE）和上櫃（OTC）股票清單
@@ -18,25 +29,36 @@ TWStockLib 是一個用於獲取台灣股市資料的 .NET 類別庫。它提供
 在 `Program.cs` 或 `Startup.cs` 中註冊 TWStockLib 服務：
 
 ```csharp
-using Microsoft.Extensions.DependencyInjection;
-using TWStockLib.Services;
-using System.Text;
-
 // 註冊編碼提供者，以支援 950 (繁體中文 Big5) 編碼
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
-var services = new ServiceCollection();
-
 // 添加 TWStockLib 服務
 services.AddStockServices();
-
-var serviceProvider = services.BuildServiceProvider();
 ```
 
 ### 步驟 2: 獲取 StockMarketService
 
+#### 在一般Console中使用：
+
 ```csharp
 var stockMarketService = serviceProvider.GetRequiredService<StockMarketService>();
+```
+
+#### 在Controller中通過依賴注入使用：
+
+```csharp
+using TWStockLib.Services;
+using TWStockLib.Models;
+
+public class YourController : Controller
+{
+    private readonly IStockMarketService _stockMarketService;
+
+    public YourController(IStockMarketService stockMarketService)
+    {
+        _stockMarketService = stockMarketService;
+    }
+}
 ```
 
 ### 步驟 3: 使用服務功能
