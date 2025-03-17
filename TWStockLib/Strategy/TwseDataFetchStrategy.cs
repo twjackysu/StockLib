@@ -1,16 +1,11 @@
+using AngleSharp.Dom;
+using AngleSharp.Html.Parser;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Text;
 using TWStockLib.Cache;
 using TWStockLib.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using AngleSharp.Html.Parser;
-using AngleSharp.Dom;
-using Newtonsoft.Json;
 
 namespace TWStockLib.Strategy
 {

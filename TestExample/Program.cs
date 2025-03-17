@@ -7,6 +7,7 @@ using TWStockLib.Models;
 using TWStockLib.Observer;
 using TWStockLib.Services;
 using System.Text;
+using TWStockLib.Observer.DefaultProvidedObservers;
 
 namespace TestExample
 {
@@ -18,11 +19,10 @@ namespace TestExample
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             
             var logger = LogManager.GetCurrentClassLogger();
-            logger.Info("Stock Test Example Start");
             try
             {
                 var config = new ConfigurationBuilder()
-                   .SetBasePath(System.IO.Directory.GetCurrentDirectory())
+                   .SetBasePath(Directory.GetCurrentDirectory())
                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                    .Build();
 
@@ -31,9 +31,6 @@ namespace TestExample
                 {
                     var stockMarketService = servicesProvider.GetRequiredService<StockMarketService>();
 
-                    // 創建一個價格觀察者
-                    var observer = stockMarketService.CreatePriceObserver("TestObserver");
-                    
                     // 獲取股票清單
                     logger.Info("獲取股票清單...");
                     var allStocks = await stockMarketService.GetAllStockList();
@@ -46,7 +43,6 @@ namespace TestExample
                         new DateTime(2019, 11, 1), 
                         new DateTime(2019, 11, 30),
                         MarketType.TSE);
-                    
                     logger.Info($"006208 歷史數據: {tseHistory.Count()} 筆");
 
                     // 獲取歷史數據 00687B
@@ -56,19 +52,28 @@ namespace TestExample
                         new DateTime(2023, 11, 1), 
                         new DateTime(2023, 11, 30),
                         MarketType.OTC);
-                    
                     logger.Info($"00687B 歷史數據: {otcHistory.Count()} 筆");
                     
                     // 獲取即時報價
                     logger.Info("獲取即時報價...");
                     var searchStockList = new string[] { "2439", "2330", "2317", "3679", "3548", "4942" };
-                    
+
+                    // 創建一個自定義價格觀察者
+                    var observer = new TestObserver(logger);
+
                     // 訂閱價格變化
                     foreach (var symbol in searchStockList)
                     {
                         stockMarketService.SubscribePriceChanges(symbol, observer);
                     }
-                    
+                    // 等5秒看有沒有變化
+                    Task.Delay(5000).Wait();
+                    // 取消訂閱
+                    foreach (var symbol in searchStockList)
+                    {
+                        stockMarketService.UnsubscribePriceChanges(symbol, observer);
+                    }
+
                     // 獲取即時報價
                     foreach (var symbol in searchStockList)
                     {
@@ -85,12 +90,6 @@ namespace TestExample
                         {
                             logger.Warn($"{symbol} 無法獲取報價");
                         }
-                    }
-                    
-                    // 取消訂閱
-                    foreach (var symbol in searchStockList)
-                    {
-                        stockMarketService.UnsubscribePriceChanges(symbol, observer);
                     }
                 }
             }
@@ -131,9 +130,9 @@ namespace TestExample
     // 自定義觀察者實現
     public class TestObserver : IStockPriceObserver
     {
-        private readonly ILogger<TestObserver> _logger;
+        private readonly Logger _logger;
         
-        public TestObserver(ILogger<TestObserver> logger)
+        public TestObserver(Logger logger)
         {
             _logger = logger;
         }
@@ -143,7 +142,7 @@ namespace TestExample
             var changePercentage = (newPrice - oldPrice) / oldPrice * 100;
             var direction = newPrice > oldPrice ? "上漲" : "下跌";
             
-            _logger.LogInformation($"股票 {symbol} {direction}: 從 {oldPrice} 到 {newPrice} ({changePercentage:F2}%)");
+            _logger.Info($"股票 {symbol} {direction}: 從 {oldPrice} 到 {newPrice} ({changePercentage:F2}%)");
         }
     }
 }

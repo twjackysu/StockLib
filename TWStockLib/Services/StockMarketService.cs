@@ -2,21 +2,16 @@ using TWStockLib.Factory;
 using TWStockLib.Models;
 using TWStockLib.Observer;
 using TWStockLib.Strategy;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace TWStockLib.Services
 {
     public class StockMarketService
     {
-        private readonly IStockMarketFactory _factory;
         private readonly StockPriceSubject _priceSubject;
         private readonly IDataFetchStrategy _dataFetchStrategy;
 
         public StockMarketService(IStockMarketFactory factory)
         {
-            _factory = factory;
             _priceSubject = new StockPriceSubject();
             _dataFetchStrategy = factory.CreateDataFetchStrategy();
         }
@@ -72,11 +67,6 @@ namespace TWStockLib.Services
             }
             
             return result;
-        }
-
-        public IStockPriceObserver CreatePriceObserver(string name)
-        {
-            return _factory.CreatePriceObserver(name);
         }
     }
 } 
